@@ -134,6 +134,8 @@ class __EXPORT ZRtp {
         uint8_t helloHash[IMPL_MAX_DIGEST_LENGTH];
     } HelloPacketVersion;
 
+    ZIDCache *zidCache;
+
     /**
      * Constructor intializes all relevant data but does not start the
      * engine.

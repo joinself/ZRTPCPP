@@ -347,7 +347,7 @@ ZrtpPacketCommit* ZRtp::prepareCommit(ZrtpPacketHello *hello, uint32_t* errMsg) 
      * To create this DH packet we have to compute the retained secret ids,
      * thus get our peer's retained secret data first.
      */
-    zidRec = getZidCacheInstance()->getRecord(peerZid);
+    zidRec = zidCache->getRecord(peerZid);
 
     //Compute the Initiator's and Responder's retained secret ids.
     computeSharedSecretSet(zidRec);
@@ -1030,7 +1030,7 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm2(ZrtpPacketConfirm* confirm1, uint32_t* 
     }
 #endif
     if (saveZidRecord)
-        getZidCacheInstance()->saveRecord(zidRec);
+        zidCache->saveRecord(zidRec);
 
     // Encrypt and HMAC with Initiator's key - we are Initiator here
     hmlen = (zrtpConfirm2.getLength() - (uint)9) * ZRTP_WORD_SIZE;
@@ -1194,7 +1194,7 @@ ZrtpPacketConf2Ack* ZRtp::prepareConf2Ack(ZrtpPacketConfirm *confirm2, uint32_t*
         // save new RS1, this inherits the verified flag from old RS1
         zidRec->setNewRs1((const uint8_t*)newRs1);
         if (saveZidRecord)
-            getZidCacheInstance()->saveRecord(zidRec);
+            zidCache->saveRecord(zidRec);
 
 #ifdef ZRTP_SAS_RELAY_SUPPORT
         // Ask for enrollment only if enabled via configuration and the
@@ -2533,13 +2533,13 @@ void ZRtp::SASVerified() {
 
     zidRec->setSasVerified();
     saveZidRecord = true;
-    getZidCacheInstance()->saveRecord(zidRec);
+    zidCache->saveRecord(zidRec);
 }
 
 void ZRtp::resetSASVerified() {
 
     zidRec->resetSasVerified();
-    getZidCacheInstance()->saveRecord(zidRec);
+    zidCache->saveRecord(zidRec);
 }
 
 bool ZRtp::isSASVerified() {
@@ -2551,7 +2551,7 @@ void ZRtp::setRs2Valid() {
     if (zidRec != nullptr) {
         zidRec->setRs2Valid();
         if (saveZidRecord)
-            getZidCacheInstance()->saveRecord(zidRec);
+            zidCache->saveRecord(zidRec);
     }
 }
 
@@ -2751,12 +2751,12 @@ void ZRtp::acceptEnrollment(bool accepted) {
     if (!accepted) {
         zidRec->resetMITMKeyAvailable();
         callback->zrtpInformEnrollment(EnrollmentCanceled);
-        getZidCacheInstance()->saveRecord(zidRec);
+        zidCache->saveRecord(zidRec);
         return;
     }
     if (pbxSecretTmp != nullptr) {
         zidRec->setMiTMData(pbxSecretTmp);
-        getZidCacheInstance()->saveRecord(zidRec);
+        zidCache->saveRecord(zidRec);
         callback->zrtpInformEnrollment(EnrollmentOk);
     }
     else {

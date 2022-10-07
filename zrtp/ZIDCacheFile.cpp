@@ -32,24 +32,15 @@
 
 #include <libzrtpcpp/ZIDCacheFile.h>
 
-
-static ZIDCacheFile* instance;
 static int errors = 0;  // maybe we will use as member of ZIDCache later...
 
 
 /**
- * A poor man's factory.
- *
- * The build process must not allow two cache file implementation classes linked
- * into the same library.
+ * Allow more than one cache file to exist for when
+ * we test multiple users in the same process
  */
-
 ZIDCache* getZidCacheInstance() {
-
-    if (instance == NULL) {
-        instance = new ZIDCacheFile();
-    }
-    return instance;
+    return new ZIDCacheFile();
 }
 
 
